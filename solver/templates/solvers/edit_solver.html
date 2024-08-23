@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Edit Solver</h1>
+    <div class="card mb-4">
+        <div class="card-header">
+            Update Solver Details
+        </div>
+        <div class="card-body">
+            <form method="post" id="editSolverForm">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary">Update Solver</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

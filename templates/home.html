@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to NEMO5GUI System</h1>
+    <p class="lead">Manage your regions, materials, domains, solvers, and boundary conditions with ease.</p>
+    <hr class="my-4">
+    <p>Generate your input deck or explore different sections of the system.</p>
+    <a href="{% url 'generate_input_deck' %}" class="btn btn-primary btn-lg">Generate Input Deck</a>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Regions</h5>
+          <p class="card-text">Manage and configure your regions.</p>
+          <a href="{% url 'regions:region_list' %}" class="btn btn-success btn-block">Go to Regions</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Materials</h5>
+          <p class="card-text">Define and edit your materials.</p>
+          <a href="{% url 'materials:material_list' %}" class="btn btn-info btn-block text-white">Go to Materials</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Domains</h5>
+          <p class="card-text">Set up and manage your domains.</p>
+          <a href="{% url 'domains:domain_list' %}" class="btn btn-warning btn-block text-white">Go to Domains</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Solvers</h5>
+          <p class="card-text">Configure and run your solvers.</p>
+          <a href="{% url 'solver:solver_list' %}" class="btn btn-danger btn-block">Go to Solvers</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Boundary Conditions</h5>
+          <p class="card-text">Configure and manage your boundary conditions.</p>
+          <a href="{% url 'boundary:boundary_condition_list' %}" class="btn btn-dark btn-block">Go to Boundary Conditions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load domain_filters %}
+
+{% block content %}
+<div class="container mt-5 domains-header">
+    <h1 class="mb-4">Edit Domain</h1>
+
+    <div class="card mb-4 form-container">
+        <div class="card-header">
+            Update Domain Details
+        </div>
+        <div class="card-body">
+            <form method="post" id="domainForm">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_domain_type" class="form-label">{{ form.domain_type.label }}</label>
+                    {{ form.domain_type|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_regions" class="form-label">{{ form.regions.label }}</label>
+                    {{ form.regions|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_mesh_dimension" class="form-label">{{ form.mesh_dimension.label }}</label>
+                    {{ form.mesh_dimension|add_class:"form-control" }}
+                </div>
+
+                <!-- Mesh Coordinates -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_xmin" class="form-label">{{ form.xmin.label }}</label>
+                        {{ form.xmin|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_xmax" class="form-label">{{ form.xmax.label }}</label>
+                        {{ form.xmax|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_nx" class="form-label">{{ form.nx.label }}</label>
+                        {{ form.nx|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_ymin" class="form-label">{{ form.ymin.label }}</label>
+                        {{ form.ymin|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_ymax" class="form-label">{{ form.ymax.label }}</label>
+                        {{ form.ymax|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_ny" class="form-label">{{ form.ny.label }}</label>
+                        {{ form.ny|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_zmin" class="form-label">{{ form.zmin.label }}</label>
+                        {{ form.zmin|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_zmax" class="form-label">{{ form.zmax.label }}</label>
+                        {{ form.zmax|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_nz" class="form-label">{{ form.nz.label }}</label>
+                        {{ form.nz|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <!-- Grid Spacing -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_dx" class="form-label">{{ form.dx.label }}</label>
+                        {{ form.dx|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_dy" class="form-label">{{ form.dy.label }}</label>
+                        {{ form.dy|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_dz" class="form-label">{{ form.dz.label }}</label>
+                        {{ form.dz|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_element_kind" class="form-label">{{ form.element_kind.label }}</label>
+                    {{ form.element_kind|add_class:"form-select" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_import_from_file" class="form-label">{{ form.import_from_file.label }}</label>
+                    {{ form.import_from_file|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_submesh_from_domain" class="form-label">{{ form.submesh_from_domain.label }}</label>
+                    {{ form.submesh_from_domain|add_class:"form-control" }}
+                </div>
+
+                <!-- Mesh Vectors -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="id_mesh_vector1" class="form-label">{{ form.mesh_vector1.label }}</label>
+                        {{ form.mesh_vector1|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_mesh_vector2" class="form-label">{{ form.mesh_vector2.label }}</label>
+                        {{ form.mesh_vector2|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_mesh_vector3" class="form-label">{{ form.mesh_vector3.label }}</label>
+                        {{ form.mesh_vector3|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_number_of_refinement_steps" class="form-label">{{ form.number_of_refinement_steps.label }}</label>
+                    {{ form.number_of_refinement_steps|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_atomistic_domains" class="form-label">{{ form.atomistic_domains.label }}</label>
+                    {{ form.atomistic_domains|add_class:"form-control" }}
+                </div>
+
+                <!-- Checkboxes -->
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.nonorthogonal_mesh }}
+                        <label class="form-check-label" for="id_nonorthogonal_mesh">{{ form.nonorthogonal_mesh.label }}</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.automatic_minimal_point_on_atom }}
+                        <label class="form-check-label" for="id_automatic_minimal_point_on_atom">{{ form.automatic_minimal_point_on_atom.label }}</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.sanity_check }}
+                        <label class="form-check-label" for="id_sanity_check">{{ form.sanity_check.label }}</label>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.parallel }}
+                        <label class="form-check-label" for="id_parallel">{{ form.parallel.label }}</label>
+                    </div>
+                </div>
+
+                <!-- Parallelization section -->
+                <div id="parallelizationFields" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_xmin_p" class="form-label">{{ form.xmin_p.label }}</label>
+                            {{ form.xmin_p|add_class:"form-control" }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_xmax_p" class="form-label">{{ form.xmax_p.label }}</label>
+                            {{ form.xmax_p|add_class:"form-control" }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_num_geom_cpus" class="form-label">{{ form.num_geom_cpus.label }}</label>
+                            {{ form.num_geom_cpus|add_class:"form-control" }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_ymin_p" class="form-label">{{ form.ymin_p.label }}</label>
+                            {{ form.ymin_p|add_class:"form-control" }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_ymax_p" class="form-label">{{ form.ymax_p.label }}</label>
+                            {{ form.ymax_p|add_class:"form-control" }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_zmin_p" class="form-label">{{ form.zmin_p.label }}</label>
+                            {{ form.zmin_p|add_class:"form-control" }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_zmax_p" class="form-label">{{ form.zmax_p.label }}</label>
+                            {{ form.zmax_p|add_class:"form-control" }}
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dark mt-3">Update Domain</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/domain_form.js' %}"></script>
+
+{% endblock %}

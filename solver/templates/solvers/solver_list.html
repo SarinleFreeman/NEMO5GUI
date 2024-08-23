@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Solver Management</h1>
+    
+    {% if dependencies_met %}
+        {% if nonlinear_form.errors %}
+        <ul>
+            {% for field in nonlinear_form %}
+                {% for error in field.errors %}
+                    <li>{{ error|escape }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
+        <!-- Nonlinear Poisson FEM Solvers -->
+        <div class="card mb-4">
+            <div class="card-header" role="button" data-bs-toggle="collapse" data-bs-target="#collapseNonlinear" aria-expanded="false" aria-controls="collapseNonlinear">
+                Add Nonlinear Poisson FEM Solver
+            </div>
+            <div id="collapseNonlinear" class="collapse">
+                <div class="card-body">
+                    <form method="post" id="nonlinearPoissonFEMForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="type" value="NonlinearPoissonFEM">
+                        {{ nonlinear_form|crispy }}
+                        <button type="submit" class="btn btn-dark">Add Solver</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    
+
+    <!-- EM Schrodinger FEM Solvers -->
+    <div class="card mb-4">
+        <div class="card-header" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSchrodinger" aria-expanded="false" aria-controls="collapseSchrodinger">
+            Add EM Schrodinger FEM Solver
+        </div>
+        <div id="collapseSchrodinger" class="collapse">
+            <div class="card-body">
+                <form method="post" id="emSchrodingerFEMForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="type" value="EMSchrodingerFEM">
+                    {{ schrodinger_form|crispy }}
+                    <button type="submit" class="btn btn-success">Add Solver</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Semiclassical FEM Solvers -->
+    <div class="card mb-4">
+        <div class="card-header" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSemiclassical" aria-expanded="false" aria-controls="collapseSemiclassical">
+            Add Semiclassical FEM Solver
+        </div>
+        <div id="collapseSemiclassical" class="collapse">
+            <div class="card-body">
+                <form method="post" id="semiclassicalFEMForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="type" value="SemiclassicalFEM">
+                    {{ semiclassical_form|crispy }}
+                    <button type="submit" class="btn btn-success">Add Solver</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of existing solvers -->
+    <div class="card">
+        <div class="card-header" role="button" data-bs-toggle="collapse" data-bs-target="#collapseList" aria-expanded="false" aria-controls="collapseList">
+            Existing Solvers
+        </div>
+        <div id="collapseList" class="collapse">
+            <div class="card-body" style="overflow-x:auto;">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solver in nonlinear_solvers %}
+                        <tr>
+                            <td>Nonlinear Poisson FEM</td>
+                            <td>{{ solver.name }}</td>
+                            <td>
+                                <a href="{% url 'solvers:edit_solver' type='nonlinearpoissonfem' pk=solver.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="{% url 'solvers:delete_solver' type='nonlinearpoissonfem' pk=solver.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% for solver in schrodinger_solvers %}
+                        <tr>
+                            <td>EM Schrodinger FEM</td>
+                            <td>{{ solver.name }}</td>
+                            <td>
+                                <a href="{% url 'solvers:edit_solver' type='emschrodingerfem' pk=solver.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="{% url 'solvers:delete_solver' type='emschrodingerfem' pk=solver.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% for solver in semiclassical_solvers %}
+                        <tr>
+                            <td>Semiclassical FEM</td>
+                            <td>{{ solver.name }}</td>
+                            <td>
+                                <a href="{% url 'solvers:edit_solver' type='semiclassicalfem' pk=solver.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="{% url 'solvers:delete_solver' type='semiclassicalfem' pk=solver.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning" role="alert">
+    Some dependencies are not set up yet. Please set up both Domains and Regions before adding solvers.
+</div>
+{% endif %}
+</div>
+{% endblock %}

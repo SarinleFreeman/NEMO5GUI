@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load domain_filters %}
+
+{% block content %}
+<div class="container mt-5 domains-header">
+    <h1>Domains Management</h1>
+    <div class="float-right mb-2">
+        <button class="btn btn-light border" id="toggleDimensions">Show Dimensions</button>
+        <button class="btn btn-light border" id="toggleMeshOptions">Show Mesh Generation Options</button>
+        <button class="btn btn-light border" id="toggleMisc">Show Miscellaneous</button>
+        <button class="btn btn-light border" id="toggleParallelization">Show Parallelization</button>
+    
+    </div>
+  
+    <div class="card mb-4 form-container">
+        <div class="card-header">
+            Add New Domain
+        </div>
+        <div class="card-body">
+            <form method="post" id="domainForm">
+                {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Basic Domain Information -->
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_domain_type" class="form-label">{{ form.domain_type.label }}</label>
+                    {{ form.domain_type|add_class:"form-select" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_regions" class="form-label">{{ form.regions.label }}</label>
+                    {{ form.regions|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_regions" class="form-label">{{ form.mesh_dimension.label }}</label>
+                    {{ form.mesh_dimension|add_class:"form-control" }}
+                </div>
+
+                <!-- Dimensions Fields Container -->
+                <div id="dimensionsFields" style="display: none;">
+                    <h4 class="mt-4 mb-3">Dimensions</h4>
+                    <div class="row">
+                        {% for field in form %}
+                            {% if field.name in "xmin,xmax,ymin,ymax,zmin,zmax,nx,ny,nz,dx,dy,dz" %}
+                                <div class="col-md-4 mb-3">
+                                    <label for="id_{{ field.name }}" class="form-label">{{ field.label }}</label>
+                                    {{ field|add_class:"form-control" }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Mesh Generation Options -->
+                <div id="meshoptionsFields" style="display: none;">
+                    <h4 class="mt-4 mb-3">Mesh Generation Options</h4>
+                    <div class="mb-3">
+                        <label for="id_element_kind" class="form-label">{{ form.element_kind.label }}</label>
+                        {{ form.element_kind|add_class:"form-select" }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_import_from_file" class="form-label">{{ form.import_from_file.label }}</label>
+                        {{ form.import_from_file|add_class:"form-control" }}  <!-- Changed to form-control for text area -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_submesh_from_domain" class="form-label">{{ form.submesh_from_domain.label }}</label>
+                        {{ form.submesh_from_domain|add_class:"form-control" }}  <!-- Changed to form-control for text area -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_mesh_vector1" class="form-label">{{ form.mesh_vector1.label }}</label>
+                        {{ form.mesh_vector1|add_class:"form-control" }}  <!-- Ensure the add_class template tag properly applies the form-control class -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_mesh_vector2" class="form-label">{{ form.mesh_vector2.label }}</label>
+                        {{ form.mesh_vector2|add_class:"form-control" }}  <!-- Ensure the add_class template tag properly applies the form-control class -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_mesh_vector3" class="form-label">{{ form.mesh_vector3.label }}</label>
+                        {{ form.mesh_vector3|add_class:"form-control" }}  <!-- Ensure the add_class template tag properly applies the form-control class -->
+                    </div>
+                </div>
+
+                <!-- Miscellaneous Options -->
+                <div id="miscFields" style="display: none;">
+                    <h4 class="mt-4 mb-3">Miscellaneous</h4>
+                    <!-- Number of Refinement Steps -->
+                    <div class="mb-3">
+                        <label for="id_number_of_refinement_steps" class="form-label">{{ form.number_of_refinement_steps.label }}</label>
+                        {{ form.number_of_refinement_steps|add_class:"form-control" }} <!-- Correctly apply form-control for numeric input -->
+                    </div>
+                    <!-- Atomistic Domains -->
+                    <div class="mb-3">
+                        <label for="id_atomistic_domains" class="form-label">{{ form.atomistic_domains.label }}</label>
+                        {{ form.atomistic_domains|add_class:"form-control" }} <!-- Correctly apply form-control for text input -->
+                    </div>
+                    <!-- Automatic Minimal Point on Atom -->
+                    <div class="form-check mb-3">
+                        {{ form.automatic_minimal_point_on_atom|add_class:"form-check-input" }} <!-- Correct class for checkbox -->
+                        <label class="form-check-label" for="id_automatic_minimal_point_on_atom">
+                            {{ form.automatic_minimal_point_on_atom.label }}
+                        </label>
+                    </div>
+                    <!-- Sanity Check -->
+                    <div class="form-check mb-3">
+                        {{ form.sanity_check|add_class:"form-check-input" }} <!-- Correct class for checkbox -->
+                        <label class="form-check-label" for="id_sanity_check">
+                            {{ form.sanity_check.label }}
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Parallelization Fields Container -->
+                <div id="parallelizationFields" style="display: none;">
+                    <h4 class="mt-4 mb-3">Parallelization</h4>
+                    <div class="mb-3">
+                        <label for="id_parallel" class="form-label">{{ form.parallel.label }}</label>
+                        {{ form.parallel|add_class:"form-check-input" }}
+                    </div>
+<!-- X Dimension Extensions -->
+<div class="mb-3">
+    <label for="id_xmin" class="form-label">{{ form.xmin.label }}</label>
+    {{ form.xmin|add_class:"form-control" }}
+</div>
+<div class="mb-3">
+    <label for="id_xmax" class="form-label">{{ form.xmax.label }}</label>
+    {{ form.xmax|add_class:"form-control" }}
+</div>
+
+<!-- Y Dimension Extensions -->
+<div class="mb-3">
+    <label for="id_ymin" class="form-label">{{ form.ymin.label }}</label>
+    {{ form.ymin|add_class:"form-control" }}
+</div>
+<div class="mb-3">
+    <label for="id_ymax" class="form-label">{{ form.ymax.label }}</label>
+    {{ form.ymax|add_class:"form-control" }}
+</div>
+
+<!-- Z Dimension Extensions -->
+<div class="mb-3">
+    <label for="id_zmin" class="form-label">{{ form.zmin.label }}</label>
+    {{ form.zmin|add_class:"form-control" }}
+</div>
+<div class="mb-3">
+    <label for="id_zmax" class="form-label">{{ form.zmax.label }}</label>
+    {{ form.zmax|add_class:"form-control" }}
+</div>
+                    <div class="mb-3">
+                        <label for="id_num_geom_cpus" class="form-label">{{ form.num_geom_cpus.label }}</label>
+                        {{ form.num_geom_cpus|add_class:"form-control" }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dark mt-3">Add Domain</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Domains
+        </div>
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Domain Type</th>
+                        <th>Regions</th>
+                        <th>Mesh Dimension</th>
+                        <th>X Min</th>
+                        <th>X Max</th>
+                        <th>Y Min</th>
+                        <th>Y Max</th>
+                        <th>Z Min</th>
+                        <th>Z Max</th>
+                        <th>NX</th>
+                        <th>NY</th>
+                        <th>NZ</th>
+                        <th>DX</th>
+                        <th>DY</th>
+                        <th>DZ</th>
+                        <th>Parallel</th>
+                        <th>MIN PARR. X EXTENSION</th>
+                        <th>MAX PARR. X EXTENSION</th>
+                        <th>MIN PARR. Y EXTENSION</th>
+                        <th>MAX PARR. Y EXTENSION</th>
+                        <th>MIN PARR. Z EXTENSION</th>
+                        <th>MAX PARR. Z EXTENSION</th>
+                        <th>CPUs</th>
+                        <th>Sanity Check</th>
+                        <th>Element Kind</th>
+                        <th>Import File Path</th>
+                        <th>Submesh Domain</th>
+                        <th>Non-orthogonal Mesh</th>
+                        <th>Mesh Vector 1</th>
+                        <th>Mesh Vector 2</th>
+                        <th>Mesh Vector 3</th>
+                        <th>Refinement Steps</th>
+                        <th>Atomistic Domains</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for domain in domains %}
+                    <tr>
+                        <td>{{ domain.name }}</td>
+                        <td>{{ domain.domain_type }}</td>
+                        <td>{{ domain.regions }}</td>
+                        <td>{{ domain.mesh_dimension }}</td>
+                        <td>{{ domain.xmin }}</td>
+                        <td>{{ domain.xmax }}</td>
+                        <td>{{ domain.ymin }}</td>
+                        <td>{{ domain.ymax }}</td>
+                        <td>{{ domain.zmin }}</td>
+                        <td>{{ domain.zmax }}</td>
+                        <td>{{ domain.nx }}</td>
+                        <td>{{ domain.ny }}</td>
+                        <td>{{ domain.nz }}</td>
+                        <td>{{ domain.dx }}</td>
+                        <td>{{ domain.dy }}</td>
+                        <td>{{ domain.dz }}</td>
+                        <td>{{ domain.parallel }}</td>
+                        <td>{{ domain.xmin_p }}</td>
+                        <td>{{ domain.xmax_p }}</td>
+                        <td>{{ domain.ymin_p }}</td>
+                        <td>{{ domain.ymax_p }}</td>
+                        <td>{{ domain.zmin_p }}</td>
+                        <td>{{ domain.zmax_p }}</td>
+                        <td>{{ domain.num_geom_cpus }}</td>
+                        <td>{{ domain.sanity_check }}</td>
+                        <td>{{ domain.element_kind }}</td>
+                        <td>{{ domain.import_from_file }}</td>
+                        <td>{{ domain.submesh_from_domain }}</td>
+                        <td>{{ domain.nonorthogonal_mesh }}</td>
+                        <td>{{ domain.mesh_vector1 }}</td>
+                        <td>{{ domain.mesh_vector2 }}</td>
+                        <td>{{ domain.mesh_vector3 }}</td>
+                        <td>{{ domain.number_of_refinement_steps }}</td>
+                        <td>{{ domain.atomistic_domains }}</td>
+                        <td>
+                            <a href="{% url 'domains:edit_domain' domain.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{% url 'domains:delete_domain' domain.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/toggle.js' %}"></script>
+
+
+{% endblock %}

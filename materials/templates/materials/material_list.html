@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load material_filters %}
+
+{% block content %}
+<div class="container mt-5 materials-header">
+    <h1>Materials Management</h1>
+    <button class="btn btn-light float-right mb-2 border" id="toggleOptionalFields">Show Optional</button>
+  
+    <div class="card mb-4 form-container">
+        <div class="card-header">
+            Add New Material
+        </div>
+        <div class="card-body">
+            <form method="post" id="materialForm">
+                {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">{{ form.name.label }}</label>
+                    {{ form.name|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_tag" class="form-label">{{ form.tag.label }}</label>
+                    {{ form.tag|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_crystal_structure" class="form-label">{{ form.crystal_structure.label }}</label>
+                    {{ form.crystal_structure|add_class:"form-select" }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_regions" class="form-label">{{ form.regions.label }}</label>
+                    {{ form.regions|add_class:"form-control" }}
+                </div>
+
+   <!-- Optional Fields Container -->
+<div id="optionalFields" style="display: none;">
+
+    <!-- Doping Type and Doping Density -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="id_doping_type" class="form-label">{{ form.doping_type.label }}</label>
+            {{ form.doping_type|add_class:"form-select" }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="id_doping_density" class="form-label">{{ form.doping_density.label }}</label>
+            {{ form.doping_density|add_class:"form-control" }}
+        </div>
+    </div>
+
+    <!-- Charge Model and Doping Ionization Model -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="id_charge_model" class="form-label">{{ form.charge_model.label }}</label>
+            {{ form.charge_model|add_class:"form-select" }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="id_doping_ionization_model" class="form-label">{{ form.doping_ionization_model.label }}</label>
+            {{ form.doping_ionization_model|add_class:"form-select" }}
+        </div>
+    </div>
+
+    <!-- Doping Temperature, Ionization Energy, and Doping Degeneracy -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="id_doping_temperature" class="form-label">{{ form.doping_temperature.label }}</label>
+            {{ form.doping_temperature|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="id_ionization_energy" class="form-label">{{ form.ionization_energy.label }}</label>
+            {{ form.ionization_energy|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="id_doping_degeneracy" class="form-label">{{ form.doping_degeneracy.label }}</label>
+            {{ form.doping_degeneracy|add_class:"form-control" }}
+        </div>
+    </div>
+
+    <!-- Disorder Type, Seed, and Polarization -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="id_disorder_type" class="form-label">{{ form.disorder_type.label }}</label>
+            {{ form.disorder_type|add_class:"form-select" }}
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="id_seed" class="form-label">{{ form.seed.label }}</label>
+            {{ form.seed|add_class:"form-control" }}
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="id_polarization" class="form-label">{{ form.polarization.label }}</label>
+            {{ form.polarization|add_class:"form-control" }}
+        </div>
+    </div>
+
+    <!-- Nanotube Indices (separate container due to conditional display) -->
+    <div class="row">
+        <div class="col-md-12 mb-3" id="nanotube_indices_container" style="display: none;">
+            <label for="id_nanotube_indices" class="form-label">{{ form.nanotube_indices.label }}</label>
+            {{ form.nanotube_indices|add_class:"form-control" }}
+        </div>
+    </div>
+
+    <!-- Strain Simulation and Is Alloy -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="id_strain_simulation" class="form-label">{{ form.strain_simulation.label }}</label>
+            {{ form.strain_simulation }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="id_is_alloy" class="form-label">{{ form.is_alloy.label }}</label>
+            {{ form.is_alloy }}
+        </div>
+    </div>
+
+    <!-- Mole Fraction (added into the last visible row correctly) -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="id_mole_fraction" class="form-label">{{ form.mole_fraction.label }}</label>
+            {{ form.mole_fraction|add_class:"form-control" }}
+        </div>
+    </div>
+</div>
+
+                <button type="submit" class="btn btn-dark">Add Material</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Existing Materials
+        </div>
+        <div class="card-body" style="overflow-x:auto;">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Tag</th>
+                        <th>Regions</th>
+                        <th>Crystal Structure</th>
+                        <th>Doping Type</th>
+                        <th>Doping Density</th>
+                        <th>Charge Model</th>
+                        <th>Doping Ionization Model</th>
+                        <th>Doping Temperature</th>
+                        <th>Ionization Energy</th>
+                        <th>Doping Degeneracy</th>
+                        <th>Nanotube Indices</th>
+                        <th>Additional Params</th>
+                        <th>Disorder Type</th>
+                        <th>Seed</th>
+                        <th>Polarization</th>
+                        <th>Strain Simulation</th>
+                        <th>Alloy</th>
+                        <th>Alloy Concentration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materials %}
+                    <tr>
+                        <td>{{ material.name }}</td>
+                        <td>{{ material.tag }}</td>
+                        <td>{{ material.regions }}</td>
+                        <td>{{ material.crystal_structure }}</td>
+                        <td>{{ material.doping_type|default:"null" }}</td>
+                        <td>{{ material.doping_density|default:"null" }}</td>
+                        <td>{{ material.charge_model|default:"null" }}</td>
+                        <td>{{ material.doping_ionization_model|default:"null" }}</td>
+                        <td>{{ material.doping_temperature|default:"null" }}</td>
+                        <td>{{ material.ionization_energy|default:"null" }}</td>
+                        <td>{{ material.doping_degeneracy|default:"null" }}</td>
+                        <td>{{ material.nanotube_indices|default:"null" }}</td>
+                        <td>{{ material.additional_params|default:"null" }}</td>
+                        <td>{{ material.disorder_type|default:"null" }}</td>
+                        <td>{{ material.seed|default:"null" }}</td>
+                        <td>{{ material.polarization|default:"null" }}</td>
+                        <td>{{ material.strain_simulation|yesno:"Yes,No" }}</td>
+                        <td>{{ material.alloy|yesno:"Yes,No" }}</td>
+                        <td>{{ material.mole_fraction|default:"null" }}</td>
+                        <td>
+                            <a href="{% url 'materials:edit_material' material.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            <a href="{% url 'materials:delete_material' material.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/toggle.js' %}"></script>
+
+{% endblock %}

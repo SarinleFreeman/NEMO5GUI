@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    
+
+    <h1>Regions Management</h1>
+
+    <!-- Normal Region Form -->
+    <div class="card mb-4">
+        <div class="card-header" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRegion" aria-expanded="false" aria-controls="collapseRegion">
+            Add Normal Region
+        </div>
+        <div id="collapseRegion" class="collapse">
+            <div class="card-body">
+                <form method="post" action="{% url 'regions:region_list' %}">
+                    {% csrf_token %}
+                    {{ region_form|crispy }}
+                    <button type="submit" name="submit_region" class="btn btn-primary">Add Normal Region</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boundary Region Form -->
+    <div class="card mb-4">
+        <div class="card-header" role="button" data-bs-toggle="collapse" data-bs-target="#collapseBoundaryRegion" aria-expanded="false" aria-controls="collapseBoundaryRegion">
+            Add Boundary Region
+        </div>
+        <div id="collapseBoundaryRegion" class="collapse">
+            <div class="card-body">
+                <form method="post" action="{% url 'regions:region_list' %}">
+                    {% csrf_token %}
+                    {{ boundary_region_form|crispy }}
+                    <button type="submit" name="submit_boundary_region" class="btn btn-primary">Add Boundary Region</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- List All Regions -->
+<div class="card mb-4">
+    <div class="card-header">
+        Regions
+    </div>
+    <div class="card-body" style="overflow-x:auto;">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Shape</th>
+                    <th>Tag</th>
+                    <th>Region Number</th>
+                    <th>Priority</th>
+                    <th>Min (x, y, z)</th>
+                    <th>Max (x, y, z)</th>
+                    <th>Work Plane</th>
+                    <th>Plane Tolerance</th>
+                    <th>Axis Cut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for region in regions %}
+                <tr>
+                    <td>{{ region.shape }}</td>
+                    <td>{{ region.tag }}</td>
+                    <td>{{ region.region_number }}</td>
+                    <td>{{ region.priority }}</td>
+                    <td>({{ region.min_x }}, {{ region.min_y }}, {{ region.min_z }})</td>
+                    <td>({{ region.max_x }}, {{ region.max_y }}, {{ region.max_z }})</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>
+                        <a href="{% url 'regions:edit_region' region.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'regions:delete_region' region.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% for region in boundary_regions %}
+                <tr>
+                    <td>{{ region.shape }}</td>
+                    <td>{{ region.tag }}</td>
+                    <td>{{ region.region_number }}</td>
+                    <td>{{ region.priority }}</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>{{ region.work_plane }}</td>
+                    <td>{{ region.plane_tolerance }}</td>
+                    <td>{{ region.axis_cut }}</td>
+                    <td>
+                        <a href="{% url 'regions:edit_boundary_region' region.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'regions:delete_boundary_region' region.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+  {% endblock %}
