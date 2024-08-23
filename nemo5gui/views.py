@@ -183,10 +183,12 @@ def generate_input_deck(materials, domains, regions, nonlinear_poisson_solvers, 
         input_deck += f"    domain = {solver.domain.name}\n"
         
         if solver.active_regions.exists():
-            total_regions = solver.active_regions.all()+boundary_regions
-            solver_regions = ", ".join([str(region.region_number) for region in total_regions])
-            input_deck += f"    active_regions = ({solver_regions})\n"
-        
+            first_set = [str(region.region_number) for region in solver.active_regions.all()]
+            second_set = [str(region.region_number) for region in boundary_regions]
+            total_set = first_set + second_set
+            nl_regions = ", ".join(total_set)
+            input_deck += f"    active_regions = ({nl_regions})\n"
+            
         # Boolean fields
         boolean_fields = [
             'Dirichlet_nodes_output', 'Newton_step_only', 'disable_init', 'disable_output',
