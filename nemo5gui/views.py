@@ -170,7 +170,7 @@ def generate_input_deck(materials, domains, regions, nonlinear_poisson_solvers, 
         input_deck += f"    add = ({boundary_region.region_number})\n"
         
         input_deck += "  }\n\n"
-    input_deck += "  }\n"
+    input_deck += "  } }\n"
 
     # Solvers
     input_deck += " Solvers {\n"
